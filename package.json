@@ -1,0 +1,53 @@
+{
+  "name": "opencode-github-prs",
+  "version": "0.1.0",
+  "description": "OpenCode 2 sidebar plugin for GitHub pull request status",
+  "type": "module",
+  "exports": {
+    "./tui": "./src/tui.tsx"
+  },
+  "files": [
+    "src/github.ts",
+    "src/tui.tsx"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:package": "node scripts/smoke-package.mjs",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm test && npm run test:package",
+    "prepublishOnly": "npm run check"
+  },
+  "keywords": [
+    "opencode",
+    "opencode2",
+    "github",
+    "pull-request",
+    "plugin"
+  ],
+  "author": "Frederico Batista",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fredericoo/opencode-github-prs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fredericoo/opencode-github-prs/issues"
+  },
+  "homepage": "https://github.com/fredericoo/opencode-github-prs#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "0.0.0-beta-17728",
+    "@opentui/solid": "0.5.4",
+    "solid-js": "^1.9.10"
+  },
+  "devDependencies": {
+    "@opencode-ai/theme": "0.0.0-beta-17728",
+    "@opentui/core": "0.5.4",
+    "@opentui/keymap": "0.5.4",
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
