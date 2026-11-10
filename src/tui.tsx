@@ -3,8 +3,8 @@
 import {spawn} from "node:child_process"
 import {join} from "node:path"
 
-import {Plugin} from "@opencode-ai/plugin/tui"
-import type {Context} from "@opencode-ai/plugin/tui/context"
+import {Plugin} from "@opencode/plugin/tui"
+import type {Context} from "@opencode/plugin/tui/context"
 import {createEffect, createMemo, For, on, onCleanup, Show} from "solid-js"
 
 import {
@@ -57,7 +57,7 @@ function View(props: {context: Context; sessionID: string}) {
   const key = createMemo(() => `${directory() ?? ""}\u0000${branch()}`)
   const entry = createMemo(() => cache[key()])
 
-  const tone = (value: Tone) => (value === "subdued" ? theme.text.subdued : theme.text.feedback[value].default)
+  const tone = (value: Tone) => (value === "subdued" ? theme.text.muted : theme.text.feedback[value].base)
 
   const load = async (maxAge: number) => {
     const dir = directory()
@@ -103,36 +103,36 @@ function View(props: {context: Context; sessionID: string}) {
   })
 
   const dot = (pr: PullRequest) => {
-    if (pr.state === "MERGED") return theme.hue.purple[500]
-    if (pr.state === "CLOSED") return theme.text.feedback.error.default
-    if (pr.isDraft) return theme.text.subdued
-    return theme.text.feedback.success.default
+    if (pr.state === "MERGED") return theme.hue.accent[500]
+    if (pr.state === "CLOSED") return theme.text.feedback.error.base
+    if (pr.isDraft) return theme.text.muted
+    return theme.text.feedback.success.base
   }
 
   return (
     <Show when={visible()}>
       <box>
         <box flexDirection="row" gap={1}>
-          <text fg={theme.text.default} onMouseDown={() => setCollapsed((draft) => (draft.value = !draft.value))}>
+          <text fg={theme.text.base} onMouseDown={() => setCollapsed((draft) => (draft.value = !draft.value))}>
             {collapsed.value ? "▶" : "▼"} <b>{prs().length === 1 ? "Pull request" : "Pull requests"}</b>
             <Show when={prs().length > 1}>
-              <span style={{fg: theme.text.subdued}}> ({prs().length})</span>
+              <span style={{fg: theme.text.muted}}> ({prs().length})</span>
             </Show>
           </text>
-          <text flexShrink={0} fg={theme.text.subdued} onMouseDown={() => void load(0)}>
+          <text flexShrink={0} fg={theme.text.muted} onMouseDown={() => void load(0)}>
             {entry()?.status === "loading" ? "·" : "↻"}
           </text>
         </box>
 
         <Show when={!collapsed.value}>
           <Show when={entry()?.status === "error"}>
-            <text fg={theme.text.feedback.error.subdued} wrapMode="word">
+            <text fg={theme.text.feedback.error.muted} wrapMode="word">
               {truncate(entry()?.error ?? "gh failed", 120)}
             </text>
           </Show>
 
           <Show when={entry()?.status !== "error" && prs().length === 0}>
-            <text fg={theme.text.subdued} wrapMode="word">
+            <text fg={theme.text.muted} wrapMode="word">
               {entry()?.status === "loading" ? "Loading…" : "None open for this branch"}
             </text>
           </Show>
@@ -143,17 +143,17 @@ function View(props: {context: Context; sessionID: string}) {
                 <text flexShrink={0} fg={dot(pr)}>
                   •
                 </text>
-                <text fg={theme.text.default} wrapMode="word">
+                <text fg={theme.text.base} wrapMode="word">
                   <a href={pr.url}>{truncate(pr.title, 64)}</a>
-                  <span style={{fg: theme.text.subdued}}>{" #" + pr.number}</span>
+                  <span style={{fg: theme.text.muted}}>{" #" + pr.number}</span>
                   <For each={badges(pr, unread().has(pr.number))}>
                     {(badge) => (
                       <>
-                        <span style={{fg: theme.text.subdued}}> · </span>
+                        <span style={{fg: theme.text.muted}}> · </span>
                         <Show when={badge.glyph}>
                           <span style={{fg: tone(badge.tone)}}>{badge.glyph} </span>
                         </Show>
-                        <span style={{fg: theme.text.subdued}}>{badge.text}</span>
+                        <span style={{fg: theme.text.muted}}>{badge.text}</span>
                       </>
                     )}
                   </For>
@@ -163,7 +163,7 @@ function View(props: {context: Context; sessionID: string}) {
           </For>
 
           <Show when={hidden() > 0 && entry()?.repo}>
-            <text fg={theme.text.subdued} onMouseUp={() => openInBrowser(`${entry()?.repo}/pulls`)}>
+            <text fg={theme.text.muted} onMouseUp={() => openInBrowser(`${entry()?.repo}/pulls`)}>
               <a href={`${entry()?.repo}/pulls`}>+{hidden()} more</a>
             </text>
           </Show>

@@ -1,5 +1,5 @@
 import {execFileSync} from "node:child_process"
-import {mkdtempSync, rmSync} from "node:fs"
+import {mkdtempSync, readFileSync, rmSync} from "node:fs"
 import {tmpdir} from "node:os"
 import {join} from "node:path"
 
@@ -14,7 +14,7 @@ try {
     }),
   )[0]
   const paths = packed.files.map((file) => file.path).sort()
-  const expected = ["LICENSE", "README.md", "package.json", "src/github.ts", "src/tui.tsx"]
+  const expected = ["LICENSE", "README.md", "dist/tui.js", "package.json"]
   if (JSON.stringify(paths) !== JSON.stringify(expected)) throw new Error(`Unexpected package files: ${paths.join(", ")}`)
 
   const install = join(directory, "install")
@@ -23,7 +23,10 @@ try {
     stdio: "ignore",
   })
 
-  const entrypoint = join(install, "node_modules", "opencode-github-prs", "src", "tui.tsx")
+  const entrypoint = join(install, "node_modules", "opencode-github-prs", "dist", "tui.js")
+  // OpenCode does not compile Solid JSX under node_modules. An entrypoint that
+  // reaches for the JSX runtime was not compiled, and renders once and never updates.
+  if (/jsx(-dev)?-runtime/.test(readFileSync(entrypoint, "utf8"))) throw new Error("Entrypoint is not compiled Solid output")
   const script = `const plugin = await import(${JSON.stringify(entrypoint)}); if (plugin.default.id !== "fredericoo.github-prs") process.exit(1)`
   execFileSync("bun", ["-e", script], {cwd: directory, stdio: "inherit"})
 } finally {

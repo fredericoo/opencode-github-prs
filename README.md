@@ -61,13 +61,25 @@ npm install
 npm run check
 ```
 
-To load a checkout directly, add the absolute entrypoint path to `cli.json`:
+To load a checkout, build it and add the checkout directory to `cli.json`:
+
+```sh
+npm run build
+```
 
 ```json
 {
-  "plugins": ["/path/to/opencode-github-prs/src/tui.tsx"]
+  "plugins": ["/path/to/opencode-github-prs"]
 }
 ```
+
+OpenCode ignores a path to a single file such as `src/tui.tsx`. Run
+`npm run build` again after changing the source.
+
+The package ships compiled output because OpenCode compiles Solid JSX only for
+plugins outside `node_modules`. An installed package that ships raw TSX loads
+without error and never updates. For the same reason, installing straight from
+Git does not work: the repository holds no build output.
 
 OpenCode 2 and its plugin API are currently beta. This package tracks the beta
 API and may need compatible releases as that API changes.

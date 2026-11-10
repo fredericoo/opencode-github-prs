@@ -4,13 +4,14 @@
   "description": "OpenCode 2 sidebar plugin for GitHub pull request status",
   "type": "module",
   "exports": {
-    "./tui": "./src/tui.tsx"
+    "./tui": "./dist/tui.js"
   },
   "files": [
-    "src/github.ts",
-    "src/tui.tsx"
+    "dist"
   ],
   "scripts": {
+    "build": "bun scripts/build.mjs",
+    "prepack": "npm run build",
     "test": "vitest run",
     "test:package": "node scripts/smoke-package.mjs",
     "typecheck": "tsc --noEmit",
@@ -37,17 +38,21 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
-    "@opencode-ai/plugin": "0.0.0-beta-17728",
-    "@opentui/solid": "0.5.4",
-    "solid-js": "^1.9.10"
-  },
   "devDependencies": {
-    "@opencode-ai/theme": "0.0.0-beta-17728",
-    "@opentui/core": "0.5.4",
-    "@opentui/keymap": "0.5.4",
+    "@opencode/theme": "^2.2.7",
+    "@opentui/core": "^0.8.1",
+    "@opentui/solid": "^0.8.1",
     "@types/node": "^24.3.0",
+    "solid-js": "^1.9.18",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.2.7"
+  },
+  "peerDependencies": {
+    "@opentui/core": ">=0.8.1",
+    "@opentui/solid": ">=0.8.1",
+    "solid-js": ">=1.9.0"
   }
 }
