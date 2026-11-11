@@ -1,8 +1,5 @@
 /** @jsxImportSource @opentui/solid */
 
-import {spawn} from "node:child_process"
-import {join} from "node:path"
-
 import {Plugin} from "@opencode/plugin/tui"
 import type {Context} from "@opencode/plugin/tui/context"
 import {createEffect, createMemo, For, on, onCleanup, Show} from "solid-js"
@@ -10,8 +7,6 @@ import {createEffect, createMemo, For, on, onCleanup, Show} from "solid-js"
 import {
   badges,
   fetchPullRequests,
-  resolveExecutable,
-  safeUrl,
   truncate,
   type PullRequest,
   type PullRequestResult,
@@ -20,27 +15,6 @@ import {
 
 type Entry = Omit<PullRequestResult, "status"> & {at: number; status: PullRequestResult["status"] | "loading"}
 type Cache = Record<string, Entry>
-
-function openInBrowser(url: string) {
-  const trustedUrl = safeUrl(url)
-  if (!trustedUrl) return
-
-  const [command, args] =
-    process.platform === "darwin"
-      ? ["/usr/bin/open", [trustedUrl]]
-      : process.platform === "win32"
-        ? [join(process.env.SystemRoot ?? "C:\\Windows", "System32", "rundll32.exe"), ["url.dll,FileProtocolHandler", trustedUrl]]
-        : [resolveExecutable("xdg-open"), [trustedUrl]]
-  if (!command) return
-
-  try {
-    const child = spawn(command, args, {detached: true, stdio: "ignore"})
-    child.on("error", () => {})
-    child.unref()
-  } catch {
-    // OSC-8 links remain usable when the platform URL opener is unavailable.
-  }
-}
 
 function View(props: {context: Context; sessionID: string}) {
   const context = props.context
@@ -139,7 +113,7 @@ function View(props: {context: Context; sessionID: string}) {
 
           <For each={shown()}>
             {(pr) => (
-              <box flexDirection="row" gap={1} onMouseUp={() => openInBrowser(pr.url)}>
+              <box flexDirection="row" gap={1}>
                 <text flexShrink={0} fg={dot(pr)}>
                   •
                 </text>
@@ -163,7 +137,7 @@ function View(props: {context: Context; sessionID: string}) {
           </For>
 
           <Show when={hidden() > 0 && entry()?.repo}>
-            <text fg={theme.text.muted} onMouseUp={() => openInBrowser(`${entry()?.repo}/pulls`)}>
+            <text fg={theme.text.muted}>
               <a href={`${entry()?.repo}/pulls`}>+{hidden()} more</a>
             </text>
           </Show>
